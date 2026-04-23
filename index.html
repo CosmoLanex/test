@@ -699,6 +699,70 @@ label{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.06em;tex
 
 /* Pagination */
 .pagination{display:flex;gap:6px;align-items:center;margin-top:16px;justify-content:flex-end}
+
+/* ── QUICK SETTINGS MODAL ── */
+#qs-overlay{
+  position:fixed;inset:0;background:rgba(6,6,8,.88);
+  backdrop-filter:blur(10px);z-index:250;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#qs-overlay.open{opacity:1;pointer-events:all}
+.qs-modal{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:16px;padding:32px;width:100%;max-width:520px;
+  box-shadow:0 24px 80px rgba(0,0,0,.85),0 0 0 1px rgba(77,163,255,.12);
+  transform:scale(.93) translateY(14px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+#qs-overlay.open .qs-modal{transform:scale(1) translateY(0)}
+.qs-title{
+  font-family:var(--font-head);font-size:20px;font-weight:800;
+  color:var(--white);margin-bottom:6px;
+}
+.qs-title span{color:var(--blue)}
+.qs-subtitle{font-size:11px;color:var(--muted);margin-bottom:24px}
+.qs-section{margin-bottom:20px}
+.qs-section-label{
+  font-size:10px;color:var(--muted);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.qs-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.qs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qs-grid.three{grid-template-columns:1fr 1fr 1fr}
+.qs-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);
+}
+.qs-toggle-label{font-size:12px;color:var(--text)}
+.qs-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+
+/* XAU ticker enhancements */
+.xau-ticker{position:relative}
+.xau-live-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px var(--green);
+  display:inline-block;margin-right:4px;
+  animation:livepulse 2s ease infinite;
+}
+.xau-live-dot.loading{background:var(--gold);box-shadow:0 0 6px var(--gold);animation:none}
+.xau-live-dot.error{background:var(--red);box-shadow:0 0 6px var(--red);animation:none}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.xau-source{font-size:9px;color:var(--subtle);margin-top:1px}
+
+/* Edit settings btn */
+.btn-settings-edit{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:var(--r2);border:1px solid var(--border);
+  cursor:pointer;font-family:var(--font-head);font-size:11px;
+  font-weight:600;letter-spacing:.04em;
+  background:var(--card);color:var(--muted);
+  transition:all .2s;white-space:nowrap;
+}
+.btn-settings-edit:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
 .page-btn{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);padding:6px 12px;cursor:pointer;
@@ -724,6 +788,74 @@ label{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.06em;tex
 
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+
+<!-- CONFIRM DIALOG -->
+<div id="qs-overlay">
+  <div class="qs-modal">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+      <div>
+        <div class="qs-title">Account <span>Settings</span></div>
+        <div class="qs-subtitle">Edit your trading account configuration and preferences</div>
+      </div>
+      <button class="modal-close" onclick="closeQS()">✕</button>
+    </div>
+
+    <!-- Account -->
+    <div class="qs-section">
+      <div class="qs-section-label">Account</div>
+      <div class="qs-grid three">
+        <div class="form-group">
+          <label>Trader Name</label>
+          <input type="text" id="qs-name" class="form-input" placeholder="e.g. PHANTOM"/>
+        </div>
+        <div class="form-group">
+          <label>Starting Balance ($)</label>
+          <input type="number" id="qs-balance" class="form-input" placeholder="10000"/>
+        </div>
+        <div class="form-group">
+          <label>Risk per Trade (%)</label>
+          <input type="number" step="0.1" id="qs-risk" class="form-input" placeholder="1.0"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display -->
+    <div class="qs-section">
+      <div class="qs-section-label">Display</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="qs-toggle-row">
+          <span class="qs-toggle-label">Show P&L column in Journal</span>
+          <label class="toggle">
+            <input type="checkbox" id="qs-pnl" checked/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="qs-toggle-row">
+          <span class="qs-toggle-label">3D Tilt effect on stat cards</span>
+          <label class="toggle">
+            <input type="checkbox" id="qs-tilt" checked/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="qs-toggle-row">
+          <span class="qs-toggle-label">Particle background animation</span>
+          <label class="toggle">
+            <input type="checkbox" id="qs-particles" checked onchange="toggleParticlesQS(this)"/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="qs-actions">
+      <button class="btn btn-ghost" onclick="closeQS()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveQS()">💾 Save Settings</button>
+    </div>
+  </div>
+</div>
 
 <!-- CONFIRM DIALOG -->
 <div id="confirm-overlay">
@@ -927,13 +1059,17 @@ label{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.06em;tex
       <div class="topbar-right">
         <div class="xau-ticker">
           <div>
-            <div class="xau-label">XAUUSD</div>
+            <div class="xau-label" style="display:flex;align-items:center">
+              <span class="xau-live-dot loading" id="xau-dot"></span>XAUUSD
+            </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <span class="xau-price" id="xau-price">—</span>
+              <span class="xau-price" id="xau-price">Loading…</span>
               <span class="xau-change" id="xau-change"></span>
             </div>
+            <div class="xau-source" id="xau-source">Fetching live price…</div>
           </div>
         </div>
+        <button class="btn-settings-edit" onclick="openQS()" title="Edit Account Settings">⚙ Edit Settings</button>
         <button class="btn btn-primary" onclick="openModal()">+ Add Trade</button>
       </div>
     </div>
@@ -1281,7 +1417,7 @@ window.addEventListener('load',()=>{
   initParticles();
   setDate();
   initTiltCards();
-  simulateXAU();
+  initXAU();
 });
 
 function setDate(){
@@ -2044,22 +2180,110 @@ function initTiltCards(){
   });
 }
 
-// ── SIMULATED XAU PRICE ──
-function simulateXAU(){
-  let price=2348.52+Math.random()*50;
-  const base=price;
-  function update(){
-    price+=(Math.random()-.48)*2.5;
-    price=Math.max(price,2200);
-    const change=(price-base).toFixed(2);
-    document.getElementById('xau-price').textContent='$'+price.toFixed(2);
-    const chEl=document.getElementById('xau-change');
-    chEl.textContent=(change>=0?'+':'')+change;
-    chEl.style.color=change>=0?'var(--green)':'var(--red)';
-    setTimeout(update,2500+Math.random()*2000);
+// ── REAL-TIME XAU PRICE ──
+let xauPrevPrice = null;
+let xauRetryTimer = null;
+
+async function fetchXAUPrice() {
+  const priceEl  = document.getElementById('xau-price');
+  const changeEl = document.getElementById('xau-change');
+  const dotEl    = document.getElementById('xau-dot');
+  const srcEl    = document.getElementById('xau-source');
+
+  // Try Source 1: metals.live (CORS-open, free, no key)
+  try {
+    const r = await fetch('https://metals.live/api/latest', {cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      const price = d.gold || d.XAU;
+      if(price && price > 0){
+        updateXAUDisplay(price, priceEl, changeEl, dotEl, srcEl, 'metals.live');
+        scheduleNextFetch(30000);
+        return;
+      }
+    }
+  } catch(e){}
+
+  // Try Source 2: Gold API (free tier, CORS-enabled)
+  try {
+    const r = await fetch('https://api.gold-api.com/price/XAU', {cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      const price = d.price || d.Price;
+      if(price && price > 0){
+        updateXAUDisplay(price, priceEl, changeEl, dotEl, srcEl, 'gold-api.com');
+        scheduleNextFetch(30000);
+        return;
+      }
+    }
+  } catch(e){}
+
+  // Try Source 3: Yahoo Finance via CORS proxy (GC=F futures ≈ spot)
+  try {
+    const url = 'https://corsproxy.io/?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1m&range=1d');
+    const r = await fetch(url, {cache:'no-store'});
+    if(r.ok){
+      const d = await r.json();
+      const price = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(price && price > 0){
+        updateXAUDisplay(price, priceEl, changeEl, dotEl, srcEl, 'Yahoo Finance');
+        scheduleNextFetch(30000);
+        return;
+      }
+    }
+  } catch(e){}
+
+  // Try Source 4: Open Exchange Rates metals endpoint via allorigins
+  try {
+    const url = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.goldpriceoz.com/gold-price-feed/');
+    // Skip this unreliable source
+  } catch(e){}
+
+  // All sources failed — show stale or error
+  dotEl.className = 'xau-live-dot error';
+  if(xauPrevPrice){
+    srcEl.textContent = 'Retrying… (last known)';
+  } else {
+    priceEl.textContent = 'Unavailable';
+    srcEl.textContent = 'Price feed offline';
   }
-  update();
+  scheduleNextFetch(15000); // retry sooner
 }
+
+function updateXAUDisplay(price, priceEl, changeEl, dotEl, srcEl, source){
+  const prev = xauPrevPrice;
+  xauPrevPrice = price;
+
+  priceEl.textContent = '$' + price.toFixed(2);
+
+  if(prev !== null){
+    const diff = price - prev;
+    const pct  = ((diff / prev) * 100).toFixed(3);
+    changeEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + ' (' + (diff>=0?'+':'') + pct + '%)';
+    changeEl.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+
+    // Flash the price
+    priceEl.style.transition = 'color .3s';
+    priceEl.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    setTimeout(() => { priceEl.style.color = 'var(--gold)'; }, 800);
+  } else {
+    changeEl.textContent = '';
+  }
+
+  dotEl.className = 'xau-live-dot';
+  const now = new Date();
+  srcEl.textContent = 'Live · ' + source + ' · ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function scheduleNextFetch(ms){
+  clearTimeout(xauRetryTimer);
+  xauRetryTimer = setTimeout(fetchXAUPrice, ms);
+}
+
+function initXAU(){
+  fetchXAUPrice();
+}
+
 
 // ── PARTICLES ──
 function initParticles(){
@@ -2108,15 +2332,60 @@ function toggleParticles(){
   localStorage.setItem('nukrax_settings',JSON.stringify(state.settings));
 }
 
+// ── QUICK SETTINGS MODAL ──
+function openQS(){
+  const s = state.settings;
+  document.getElementById('qs-name').value    = s.name    || '';
+  document.getElementById('qs-balance').value = s.balance || 10000;
+  document.getElementById('qs-risk').value    = s.risk    || 1;
+  document.getElementById('qs-pnl').checked   = s.showPnl !== false;
+  document.getElementById('qs-tilt').checked  = s.tilt    !== false;
+  document.getElementById('qs-particles').checked = s.particles !== false;
+  document.getElementById('qs-overlay').classList.add('open');
+}
+function closeQS(){
+  document.getElementById('qs-overlay').classList.remove('open');
+}
+function saveQS(){
+  const s = state.settings;
+  const newBal = +document.getElementById('qs-balance').value || 10000;
+  s.name      = document.getElementById('qs-name').value    || 'TRADER';
+  s.balance   = newBal;
+  s.risk      = +document.getElementById('qs-risk').value   || 1;
+  s.showPnl   = document.getElementById('qs-pnl').checked;
+  s.tilt      = document.getElementById('qs-tilt').checked;
+  s.particles = document.getElementById('qs-particles').checked;
+
+  // Sync settings page fields too
+  document.getElementById('set-balance').value = s.balance;
+  document.getElementById('set-risk').value    = s.risk;
+  document.getElementById('set-name').value    = s.name;
+  document.getElementById('tog-pnl').checked   = s.showPnl;
+  document.getElementById('tog-tilt').checked  = s.tilt;
+  document.getElementById('tog-particles').checked = s.particles;
+
+  // Apply particle toggle
+  document.getElementById('particles').style.display = s.particles ? 'block' : 'none';
+
+  localStorage.setItem('nukrax_settings', JSON.stringify(s));
+  closeQS();
+  renderAll();
+  toast('Settings saved successfully', 'success');
+}
+function toggleParticlesQS(el){
+  document.getElementById('particles').style.display = el.checked ? 'block' : 'none';
+}
+
 // ── KEYBOARD SHORTCUTS ──
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeConfirm()}
+  if(e.key==='Escape'){closeModal();closeConfirm();closeQS()}
   if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();openModal()}
 });
 
 // Click outside modal to close
 document.getElementById('trade-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
 document.getElementById('confirm-overlay').addEventListener('click',function(e){if(e.target===this)closeConfirm()});
+document.getElementById('qs-overlay').addEventListener('click',function(e){if(e.target===this)closeQS()});
 </script>
 </body>
 </html>
